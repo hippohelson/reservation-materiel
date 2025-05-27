@@ -1,7 +1,7 @@
 import { defineData } from '@aws-amplify/backend';
 
 export const data = defineData({
-  models: {
+  schemas: {
     Student: {
       fields: {
         id: 'ID!',
