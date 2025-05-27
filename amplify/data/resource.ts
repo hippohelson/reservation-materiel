@@ -2,32 +2,34 @@ import { defineData } from '@aws-amplify/backend';
 
 export const data = defineData({
   schema: {
-    Student: {
-      fields: {
-        id: 'ID!',
-        name: 'String!',
+    models: {
+      Student: {
+        fields: {
+          id: 'ID!',
+          name: 'String!',
+        },
       },
-    },
-    Equipment: {
-      fields: {
-        id: 'ID!',
-        name: 'String!',
-        category: 'String',
-        description: 'String',
-        image: 'String',
-        quantity: 'Int',
+      Equipment: {
+        fields: {
+          id: 'ID!',
+          name: 'String!',
+          category: 'String',
+          description: 'String',
+          image: 'String',
+          quantity: 'Int',
+        },
       },
-    },
-    Reservation: {
-      fields: {
-        id: 'ID!',
-        studentID: 'ID!',
-        equipmentID: 'ID!',
-        startDate: 'AWSDate!',
-        endDate: 'AWSDate!',
-        status: {
-          type: 'String',
-          default: 'confirmed',
+      Reservation: {
+        fields: {
+          id: 'ID!',
+          studentID: 'ID!',
+          equipmentID: 'ID!',
+          startDate: 'AWSDate!',
+          endDate: 'AWSDate!',
+          status: {
+            type: 'String',
+            default: 'confirmed',
+          },
         },
       },
     },
