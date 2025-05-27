@@ -4,8 +4,8 @@ export const data = defineData({
   schema: a.schema({
     Student: a.model({
       name: a.string().required(),
-    }).authorization([
-      a.allow.publicApiKey().to(['read', 'create', 'update', 'delete']),
+    }).authRules([
+      a.auth.public().to(['read', 'create', 'update', 'delete']),
     ]),
 
     Equipment: a.model({
@@ -14,8 +14,8 @@ export const data = defineData({
       description: a.string(),
       image: a.string(),
       quantity: a.integer(),
-    }).authorization([
-      a.allow.publicApiKey().to(['read', 'create', 'update', 'delete']),
+    }).authRules([
+      a.auth.public().to(['read', 'create', 'update', 'delete']),
     ]),
 
     Reservation: a.model({
@@ -24,8 +24,8 @@ export const data = defineData({
       startDate: a.date().required(),
       endDate: a.date().required(),
       status: a.string().default('confirmed'),
-    }).authorization([
-      a.allow.publicApiKey().to(['read', 'create', 'update', 'delete']),
+    }).authRules([
+      a.auth.public().to(['read', 'create', 'update', 'delete']),
     ]),
   }),
 });
