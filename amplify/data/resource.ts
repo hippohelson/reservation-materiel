@@ -4,7 +4,7 @@ export const data = defineData({
   schema: a.schema({
     Student: a.model({
       name: a.string().required(),
-    }),
+    }).authorization(allow => [allow.public()]),
 
     Equipment: a.model({
       name: a.string().required(),
@@ -12,7 +12,7 @@ export const data = defineData({
       description: a.string(),
       image: a.string(),
       quantity: a.integer(),
-    }),
+    }).authorization(allow => [allow.public()]),
 
     Reservation: a.model({
       studentId: a.id().required(),
@@ -20,6 +20,6 @@ export const data = defineData({
       startDate: a.date().required(),
       endDate: a.date().required(),
       status: a.string().default('confirmed'),
-    }),
+    }).authorization(allow => [allow.public()]),
   }),
 });
