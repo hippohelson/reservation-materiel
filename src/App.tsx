@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { Amplify } from "aws-amplify";
-import awsconfig from "./aws-exports";
+import amplifyOutputs from "../amplify_outputs.json";
 
-Amplify.configure(awsconfig);
+Amplify.configure(amplifyOutputs);
 
 const client = generateClient<Schema>();
 
