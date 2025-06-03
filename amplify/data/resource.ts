@@ -24,6 +24,7 @@ const schema = a.schema({
       description: a.string(),
       image: a.string(),
       quantity: a.integer(),
+      deposit: a.integer(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
   Reservation: a
