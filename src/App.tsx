@@ -1,38 +1,35 @@
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
+import { Amplify } from "aws-amplify";
+import awsconfig from "./aws-exports.js";
+
+Amplify.configure(awsconfig);
 
 const client = generateClient<Schema>();
 
 function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const [equipmentList, setEquipmentList] = useState<Array<Schema["Equipment"]["type"]>>([]);
 
   useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
+    // Liste tous les équipements
+    client.models.Equipment.list().then((res) => {
+      setEquipmentList(res.data);
     });
   }, []);
 
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
-  }
-
   return (
     <main>
-      <h1>My todos</h1>
-      <button onClick={createTodo}>+ new</button>
+      <h1>Équipements disponibles</h1>
       <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
+        {equipmentList.map((equip) => (
+          <li key={equip.id}>
+            <strong>{equip.name}</strong>
+            {equip.category && ` — ${equip.category}`}
+            {equip.description && ` : ${equip.description}`}
+          </li>
         ))}
       </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-          Review next step of this tutorial.
-        </a>
-      </div>
     </main>
   );
 }
