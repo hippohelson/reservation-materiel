@@ -4,7 +4,7 @@ export const storage = defineStorage({
   name: 'equipmentReservationStorage',
   access: (allow) => ({
     'equipments/*': [
-        allow.guest.to(['write']),
+        allow.guest.to(['read', 'write']),
         allow.authenticated.to(['read', 'write', 'delete']),
     ],
   }),
