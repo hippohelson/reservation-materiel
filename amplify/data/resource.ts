@@ -15,7 +15,7 @@ const schema = a.schema({
   Student: a
     .model({
       name: a.string().required(),
-      email: a.string().email().required(),
+      email: a.email().required(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
   Equipment: a
