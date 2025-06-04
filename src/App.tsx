@@ -1,10 +1,13 @@
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { Amplify } from "aws-amplify";
 import amplifyOutputs from "../amplify_outputs.json";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import type { Schema } from "../amplify/data/resource";
+
 import AddEquipment from "./pages/AddEquipment";
+import "./App.css";
+import "./components/EquipmentGrid.css"; // si ce n’est pas déjà importé
 
 Amplify.configure(amplifyOutputs);
 const client = generateClient<Schema>();
@@ -19,25 +22,21 @@ function Home() {
   }, []);
 
   return (
-    <main>
+    <div>
       <h1>Équipements disponibles</h1>
-      <Link to="/add">➕ Ajouter un matériel</Link>
-      <ul>
-        {equipmentList.map((equip) => (
-          <li key={equip.id}>
-            <strong>{equip.name}</strong>
-            {equip.category && ` — ${equip.category}`}
-            {equip.description && ` : ${equip.description}`}
-          </li>
-        ))}
-      </ul>
-    </main>
+      {/* Ta future grille ici */}
+      {/* On l'intégrera ensuite */}
+    </div>
   );
 }
 
 export default function App() {
   return (
     <Router>
+      <nav>
+        <Link to="/">Accueil</Link> | <Link to="/add">Ajouter un équipement</Link>
+      </nav>
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/add" element={<AddEquipment />} />
