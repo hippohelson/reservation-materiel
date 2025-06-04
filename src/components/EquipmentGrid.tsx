@@ -33,10 +33,24 @@ export default function EquipmentGrid({ equipmentList }: EquipmentGridProps) {
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const categories = Array.from(new Set(equipmentList.map((e) => e.category).filter(Boolean)));
+
 
   return (
     <div>
-      <h1>Équipements disponibles</h1>
+      <div>
+        <label>Filtrer par catégorie :</label>
+        <select value={selectedCategory ?? ""} onChange={(e) => setSelectedCategory(e.target.value || null)}>
+            <option value="">Toutes</option>
+            {categories.map((cat) => (
+            <option key={cat} value={cat}>
+                {cat}
+            </option>
+            ))}
+        </select>
+      </div>
+
       <div className="grid">
         {equipmentList.map((equip) => (
           <div className="card" key={equip.id} onClick={() => setModalData(equip)}>
