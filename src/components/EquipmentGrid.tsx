@@ -54,7 +54,9 @@ export default function EquipmentGrid({ equipmentList }: EquipmentGridProps) {
       </div>
 
       <div className="grid">
-        {equipmentList.map((equip) => (
+        {equipmentList
+            .filter((equip) => !selectedCategory || equip.category === selectedCategory)
+            .map((equip) => (
           <div className="card" key={equip.id} onClick={() => setModalData(equip)}>
             {imageUrls[equip.id] && (
               <img src={imageUrls[equip.id]} alt={equip.name} className="thumbnail" />
