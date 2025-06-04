@@ -20,7 +20,7 @@ export default function EquipmentGrid() {
       for (const eq of res.data) {
         if (eq.image) {
           const { url } = await getUrl({ path: eq.image });
-          urls[eq.id] = url;
+          urls[eq.id] = url.toString();
         }
       }
       setImageUrls(urls);
