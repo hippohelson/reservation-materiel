@@ -34,8 +34,10 @@ export default function EquipmentGrid({ equipmentList }: EquipmentGridProps) {
     );
   };
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const categories = Array.from(new Set(equipmentList.map((e) => e.category).filter(Boolean)));
-
+  const categories: string[] = Array.from(
+    new Set(equipmentList.map((e) => e.category).filter((c): c is string => !!c))
+  );
+  
 
   return (
     <div>
@@ -44,7 +46,7 @@ export default function EquipmentGrid({ equipmentList }: EquipmentGridProps) {
         <select value={selectedCategory ?? ""} onChange={(e) => setSelectedCategory(e.target.value || null)}>
             <option value="">Toutes</option>
             {categories.map((cat) => (
-            <option key={cat} value={cat}>
+            <option key={cat as string} value={cat ?? ""}>
                 {cat}
             </option>
             ))}
