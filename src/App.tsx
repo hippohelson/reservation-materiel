@@ -5,6 +5,7 @@ import { Amplify } from "aws-amplify";
 import amplifyOutputs from "../amplify_outputs.json";
 import type { Schema } from "../amplify/data/resource";
 
+import EquipmentGrid from "./components/EquipmentGrid";
 import AddEquipment from "./pages/AddEquipment";
 import "./App.css";
 import "./components/EquipmentGrid.css"; // si ce n’est pas déjà importé
@@ -24,10 +25,10 @@ function Home() {
   return (
     <div>
       <h1>Équipements disponibles</h1>
-      {/* Ta future grille ici */}
-      {/* On l'intégrera ensuite */}
+      <EquipmentGrid equipmentList={equipmentList} />
     </div>
   );
+  
 }
 
 export default function App() {
