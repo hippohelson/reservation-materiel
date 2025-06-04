@@ -15,6 +15,7 @@ export default function AddEquipment() {
     imageFile: null as File | null,
   });
 
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -25,6 +26,11 @@ export default function AddEquipment() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setForm((f) => ({ ...f, imageFile: file }));
+    if (file) {
+      setPreviewUrl(URL.createObjectURL(file));
+    } else {
+      setPreviewUrl(null);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,6 +58,7 @@ export default function AddEquipment() {
 
       alert("Matériel ajouté !");
       setForm({ name: "", category: "", description: "", quantity: 1, deposit: 0, imageFile: null });
+      setPreviewUrl(null);
     } catch (err) {
       console.error(err);
       alert("Erreur lors de l'ajout");
@@ -61,7 +68,7 @@ export default function AddEquipment() {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: "auto" }}>
+    <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: "auto", display: "flex", flexDirection: "column", gap: 12 }}>
       <h2>Ajouter un matériel</h2>
 
       <input name="name" placeholder="Nom" value={form.name} onChange={handleChange} required />
@@ -70,6 +77,8 @@ export default function AddEquipment() {
       <input name="quantity" type="number" min={1} value={form.quantity} onChange={handleChange} required />
       <input name="deposit" type="number" min={0} value={form.deposit} onChange={handleChange} required />
       <input type="file" accept="image/*" onChange={handleFileChange} required />
+
+      {previewUrl && <img src={previewUrl} alt="Prévisualisation" style={{ maxWidth: "100%", marginTop: 10 }} />}
 
       <button type="submit" disabled={loading}>
         {loading ? "Ajout en cours..." : "Ajouter"}
