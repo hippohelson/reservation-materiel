@@ -1,31 +1,32 @@
 import { useEffect, useState } from "react";
 import Modal from "react-modal";
 import type { Schema } from "../../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
 import { getUrl } from "aws-amplify/storage";
 import "./EquipmentGrid.css";
 
-const client = generateClient<Schema>();
+type EquipmentGridProps = {
+  equipmentList: Schema["Equipment"]["type"][];
+};
 
-export default function EquipmentGrid() {
-  const [equipmentList, setEquipmentList] = useState<Schema["Equipment"]["type"][]>([]);
+export default function EquipmentGrid({ equipmentList }: EquipmentGridProps) {
   const [selectedEquipments, setSelectedEquipments] = useState<string[]>([]);
   const [modalData, setModalData] = useState<Schema["Equipment"]["type"] | null>(null);
   const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    client.models.Equipment.list().then(async (res) => {
-      setEquipmentList(res.data);
+    const fetchImages = async () => {
       const urls: Record<string, string> = {};
-      for (const eq of res.data) {
+      for (const eq of equipmentList) {
         if (eq.image) {
           const { url } = await getUrl({ path: eq.image });
           urls[eq.id] = url.toString();
         }
       }
       setImageUrls(urls);
-    });
-  }, []);
+    };
+
+    fetchImages();
+  }, [equipmentList]);
 
   const toggleSelection = (id: string) => {
     setSelectedEquipments((prev) =>
