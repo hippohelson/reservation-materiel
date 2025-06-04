@@ -18,8 +18,8 @@ export default function EquipmentGrid({ equipmentList }: EquipmentGridProps) {
       const urls: Record<string, string> = {};
       for (const eq of equipmentList) {
         if (eq.image) {
-          const { url } = await getUrl({ path: eq.image });
-          urls[eq.id] = url.toString();
+            const { url } = await getUrl({ path: eq.image });
+            urls[eq.id] = url.href;            
         }
       }
       setImageUrls(urls);
