@@ -8,6 +8,7 @@ import Select from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import EquipmentGrid from "./components/EquipmentGrid";
+import ReservationStepForm from "./components/ReservationStepForm";
 import AddEquipment from "./pages/AddEquipment";
 import "./App.css";
 import "./components/EquipmentGrid.css";
@@ -103,7 +104,7 @@ export default function App() {
       </nav>
 
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<ReservationStepForm />} />
         <Route path="/add" element={<AddEquipment />} />
       </Routes>
     </Router>
