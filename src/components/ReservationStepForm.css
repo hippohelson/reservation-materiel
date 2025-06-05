@@ -1,53 +1,82 @@
-.step-form {
-    max-width: 500px;
-    margin: 2rem auto;
+.reservation-stepper {
+    max-width: 600px;
+    margin: 0 auto;
     padding: 2rem;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    font-family: system-ui, sans-serif;
   }
   
-  .form-step {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+  .step {
+    margin-bottom: 2rem;
+    transition: all 0.3s ease-in-out;
   }
   
-  .step-nav {
+  .step label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .summary {
+    background: #f2f2f2;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+  }
+  
+  .actions {
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
+    margin-top: 1rem;
   }
   
-  label {
-    font-weight: bold;
-  }
-  
-  button {
-    padding: 0.5rem 1.2rem;
+  .actions button {
+    background-color: #0070f3;
     border: none;
+    color: white;
+    padding: 0.6rem 1.2rem;
     border-radius: 6px;
-    font-size: 1rem;
     cursor: pointer;
+    transition: background-color 0.2s;
   }
   
-  button:disabled {
-    opacity: 0.5;
+  .actions button:hover {
+    background-color: #005ad2;
+  }
+  
+  .actions button:disabled {
+    background-color: #ccc;
     cursor: not-allowed;
   }
   
-  button:not(:disabled) {
-    background-color: #0072ff;
-    color: white;
+  .equipment-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
   }
   
-  .recap {
-    background: #f7f7f7;
-    padding: 1rem;
-    border-radius: 6px;
-    margin-bottom: 1rem;
-    font-size: 0.95rem;
-    color: #333;
+  .equip-card {
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 0.5rem;
+    text-align: center;
+    background: #f9f9f9;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  
+  .equip-card img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+  
+  .equip-card.selected {
+    border-color: #0070f3;
+    background: #e9f2ff;
   }
   
