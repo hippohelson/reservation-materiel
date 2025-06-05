@@ -181,7 +181,10 @@ export default function ReservationFormStep() {
           </ul>
           <p><strong>Total caution :</strong> {totalDeposit} €</p>
           <div className="actions between">
-            <button onClick={() => setStep(3)}>Précédent</button>
+            <button onClick={() => {
+                setSelectedEquipments([]); // reset si retour
+                setStep(3);
+              }}>Précédent</button>
             <button onClick={handleSubmit}>Valider la réservation</button>
           </div>
         </div>
