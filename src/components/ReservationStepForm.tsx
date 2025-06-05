@@ -6,7 +6,7 @@ import type { Schema } from "../../amplify/data/resource";
 import Select from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import "./ReservationStepper.css";
+import "./ReservationStepForm.css";
 
 const client = generateClient<Schema>();
 
