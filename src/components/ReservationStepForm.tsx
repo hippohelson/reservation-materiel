@@ -9,15 +9,12 @@ import "./ReservationStepForm.css";
 
 const client = generateClient<Schema>();
 
-export default function ReservationFormStep() {
+export default function ReservationStepForm() {
   const [step, setStep] = useState(0);
-
   const [students, setStudents] = useState<Schema["Student"]["type"][]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Schema["Student"]["type"] | null>(null);
-
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-
   const [equipmentList, setEquipmentList] = useState<Schema["Equipment"]["type"][]>([]);
   const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
   const [selectedEquipments, setSelectedEquipments] = useState<Schema["Equipment"]["type"][]>([]);
@@ -47,27 +44,34 @@ export default function ReservationFormStep() {
   const handleSubmit = async () => {
     if (!selectedStudent || !startDate || !endDate || selectedEquipments.length === 0) return;
 
-    await client.models.Reservation.create({
-      studentId: selectedStudent.id,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-      equipmentId: selectedEquipments[0].id,
-      totalDeposit,
-    });
+    try {
+      for (const eq of selectedEquipments) {
+        await client.models.Reservation.create({
+          studentId: selectedStudent.id,
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          equipmentId: eq.id,
+          totalDeposit,
+        });
+      }
 
-    alert("Réservation enregistrée !");
-    setTimeout(() => {
-      setStep(0);
-      setSelectedStudent(null);
-      setStartDate(null);
-      setEndDate(null);
-      setSelectedEquipments([]);
-    }, 600);
+      alert("Réservation enregistrée !");
+      setTimeout(() => {
+        setStep(0);
+        setSelectedStudent(null);
+        setStartDate(null);
+        setEndDate(null);
+        setSelectedEquipments([]);
+      }, 600);
+    } catch (err) {
+      console.error("Erreur lors de la création :", err);
+      alert("Une erreur est survenue lors de la réservation.");
+    }
   };
 
   return (
     <div className="reservation-form">
-      {/* Étape 0 : Étudiant */}
+      {/* Étape 0 */}
       {step === 0 && (
         <div className="step">
           <label>Étudiant :</label>
@@ -83,7 +87,7 @@ export default function ReservationFormStep() {
         </div>
       )}
 
-      {/* Étape 1 : Date de début */}
+      {/* Étape 1 */}
       {step === 1 && (
         <div className="step">
           <label>Étudiant :</label>
@@ -103,7 +107,7 @@ export default function ReservationFormStep() {
         </div>
       )}
 
-      {/* Étape 2 : Date de fin */}
+      {/* Étape 2 */}
       {step === 2 && (
         <div className="step">
           <label>Étudiant :</label>
@@ -125,9 +129,7 @@ export default function ReservationFormStep() {
           <div className="actions between">
             <button onClick={() => setStep(1)}>Précédent</button>
             <button
-              disabled={
-                !endDate || !startDate || endDate.getTime() <= startDate.getTime()
-              }              
+              disabled={!endDate || !startDate || endDate <= startDate}
               onClick={() => {
                 setSelectedEquipments([]); // reset si retour
                 setStep(3);
@@ -139,7 +141,7 @@ export default function ReservationFormStep() {
         </div>
       )}
 
-      {/* Étape 3 : Matériel */}
+      {/* Étape 3 */}
       {step === 3 && (
         <div className="step">
           <label>Équipements disponibles :</label>
@@ -166,7 +168,7 @@ export default function ReservationFormStep() {
         </div>
       )}
 
-      {/* Étape 4 : Récapitulatif */}
+      {/* Étape 4 */}
       {step === 4 && (
         <div className="step">
           <h3>Récapitulatif</h3>
@@ -182,9 +184,9 @@ export default function ReservationFormStep() {
           <p><strong>Total caution :</strong> {totalDeposit} €</p>
           <div className="actions between">
             <button onClick={() => {
-                setSelectedEquipments([]); // reset si retour
-                setStep(3);
-              }}>Précédent</button>
+              setSelectedEquipments([]); // reset si retour
+              setStep(3);
+            }}>Précédent</button>
             <button onClick={handleSubmit}>Valider la réservation</button>
           </div>
         </div>
