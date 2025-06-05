@@ -5,7 +5,7 @@ import { generateClient } from "aws-amplify/data";
 import { getUrl } from "aws-amplify/storage";
 import type { Schema } from "../../amplify/data/resource";
 import "react-datepicker/dist/react-datepicker.css";
-import "./ReservationFormStep.css";
+import "./ReservationStepForm.css";
 
 const client = generateClient<Schema>();
 
