@@ -1,22 +1,22 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { generateClient } from "aws-amplify/data";
+//import { useEffect, useState } from "react";
+//import { generateClient } from "aws-amplify/data";
 import { Amplify } from "aws-amplify";
 import amplifyOutputs from "../amplify_outputs.json";
-import type { Schema } from "../amplify/data/resource";
-import Select from "react-select";
-import DatePicker from "react-datepicker";
+//import type { Schema } from "../amplify/data/resource";
+//import Select from "react-select";
+//import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import EquipmentGrid from "./components/EquipmentGrid";
+//import EquipmentGrid from "./components/EquipmentGrid";
 import ReservationStepForm from "./components/ReservationStepForm";
 import AddEquipment from "./pages/AddEquipment";
 import "./App.css";
 import "./components/EquipmentGrid.css";
 
 Amplify.configure(amplifyOutputs);
-const client = generateClient<Schema>();
+//const client = generateClient<Schema>();
 
-function Home() {
+/* function Home() {
   const [students, setStudents] = useState<Array<Schema["Student"]["type"]>>([]);
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -94,7 +94,7 @@ function Home() {
       )}
     </div>
   );
-}
+} */
 
 export default function App() {
   return (
