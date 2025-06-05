@@ -1,25 +1,24 @@
-// ReservationStepper.tsx
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import Select from "react-select";
+import DatePicker from "react-datepicker";
 import { generateClient } from "aws-amplify/data";
 import { getUrl } from "aws-amplify/storage";
 import type { Schema } from "../../amplify/data/resource";
-import Select from "react-select";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import "./ReservationStepForm.css";
+import "./ReservationFormStep.css";
 
 const client = generateClient<Schema>();
 
-export default function ReservationStepper() {
+export default function ReservationFormStep() {
   const [step, setStep] = useState(0);
 
-  const [students, setStudents] = useState<Array<Schema["Student"]["type"]>>([]);
+  const [students, setStudents] = useState<Schema["Student"]["type"][]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Schema["Student"]["type"] | null>(null);
 
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
-  const [equipmentList, setEquipmentList] = useState<Array<Schema["Equipment"]["type"]>>([]);
+  const [equipmentList, setEquipmentList] = useState<Schema["Equipment"]["type"][]>([]);
   const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
   const [selectedEquipments, setSelectedEquipments] = useState<Schema["Equipment"]["type"][]>([]);
 
@@ -45,93 +44,129 @@ export default function ReservationStepper() {
 
   const totalDeposit = selectedEquipments.reduce((sum, eq) => sum + (eq.deposit ?? 0), 0);
 
+  const handleSubmit = async () => {
+    if (!selectedStudent || !startDate || !endDate || selectedEquipments.length === 0) return;
+
+    await client.models.Reservation.create({
+      studentId: selectedStudent.id,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      equipmentId: selectedEquipments[0].id,
+      totalDeposit,
+    });
+
+    alert("Réservation enregistrée !");
+    setTimeout(() => {
+      setStep(0);
+      setSelectedStudent(null);
+      setStartDate(null);
+      setEndDate(null);
+      setSelectedEquipments([]);
+    }, 600);
+  };
+
   return (
-    <div className="reservation-stepper">
-      {step >= 0 && (
+    <div className="reservation-form">
+      {/* Étape 0 : Étudiant */}
+      {step === 0 && (
         <div className="step">
           <label>Étudiant :</label>
-          {step === 0 ? (
-            <>
-              <Select
-                options={students.map((s) => ({ value: s, label: s.name }))}
-                value={selectedStudent ? { value: selectedStudent, label: selectedStudent.name } : null}
-                onChange={(opt) => setSelectedStudent(opt?.value || null)}
-              />
-              <button disabled={!selectedStudent} onClick={() => setStep(1)}>Suivant</button>
-            </>
-          ) : (
-            <div className="summary">{selectedStudent?.name}</div>
-          )}
+          <Select
+            options={students.map((s) => ({ value: s, label: s.name }))}
+            value={selectedStudent ? { value: selectedStudent, label: selectedStudent.name } : null}
+            onChange={(opt) => setSelectedStudent(opt?.value || null)}
+            placeholder="Choisir un étudiant"
+          />
+          <div className="actions end">
+            <button disabled={!selectedStudent} onClick={() => setStep(1)}>Suivant</button>
+          </div>
         </div>
       )}
 
-      {step >= 1 && (
+      {/* Étape 1 : Date de début */}
+      {step === 1 && (
         <div className="step">
+          <label>Étudiant :</label>
+          <div className="summary">{selectedStudent?.name}</div>
+
           <label>Date de début :</label>
-          {step === 1 ? (
-            <>
-              <DatePicker
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                dateFormat="dd/MM/yyyy"
-                placeholderText="Date de début"
-              />
-              <div className="actions">
-                <button onClick={() => setStep(0)}>Précédent</button>
-                <button disabled={!startDate} onClick={() => setStep(2)}>Suivant</button>
-              </div>
-            </>
-          ) : (
-            <div className="summary">📅 Début : {startDate?.toLocaleDateString()}</div>
-          )}
+          <DatePicker
+            selected={startDate}
+            onChange={(date) => setStartDate(date)}
+            dateFormat="dd/MM/yyyy"
+            placeholderText="Date de début"
+          />
+          <div className="actions between">
+            <button onClick={() => setStep(0)}>Précédent</button>
+            <button disabled={!startDate} onClick={() => setStep(2)}>Suivant</button>
+          </div>
         </div>
       )}
 
-      {step >= 2 && (
+      {/* Étape 2 : Date de fin */}
+      {step === 2 && (
         <div className="step">
+          <label>Étudiant :</label>
+          <div className="summary">{selectedStudent?.name}</div>
+          <label>Date de début :</label>
+          <div className="summary">{startDate?.toLocaleDateString()}</div>
+
           <label>Date de retour :</label>
-          {step === 2 ? (
-            <>
-              <DatePicker
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                dateFormat="dd/MM/yyyy"
-                minDate={startDate ?? undefined}
-                placeholderText="Date de retour"
-              />
-              <div className="actions">
-                <button onClick={() => setStep(1)}>Précédent</button>
-                <button disabled={!endDate} onClick={() => setStep(3)}>Suivant</button>
-              </div>
-            </>
-          ) : (
-            <div className="summary">📅 Retour : {endDate?.toLocaleDateString()}</div>
+          <DatePicker
+            selected={endDate}
+            onChange={(date) => setEndDate(date)}
+            dateFormat="dd/MM/yyyy"
+            minDate={startDate ?? undefined}
+            placeholderText="Date de retour"
+          />
+          {endDate && startDate && endDate <= startDate && (
+            <p className="error">La date de retour doit être après la date de début.</p>
           )}
+          <div className="actions between">
+            <button onClick={() => setStep(1)}>Précédent</button>
+            <button
+              disabled={
+                !endDate || !startDate || endDate.getTime() <= startDate.getTime()
+              }              
+              onClick={() => {
+                setSelectedEquipments([]); // reset si retour
+                setStep(3);
+              }}
+            >
+              Suivant
+            </button>
+          </div>
         </div>
       )}
 
+      {/* Étape 3 : Matériel */}
       {step === 3 && (
         <div className="step">
-          <h3>Équipements disponibles :</h3>
+          <label>Équipements disponibles :</label>
           <div className="equipment-list">
             {equipmentList.map((eq) => (
-              <div key={eq.id} className={`equip-card ${selectedEquipments.includes(eq) ? "selected" : ""}`} onClick={() => {
-                setSelectedEquipments((prev) =>
-                  prev.includes(eq) ? prev.filter(e => e !== eq) : [...prev, eq]
-                );
-              }}>
+              <div
+                key={eq.id}
+                className={`equip-card ${selectedEquipments.includes(eq) ? "selected" : ""}`}
+                onClick={() =>
+                  setSelectedEquipments((prev) =>
+                    prev.includes(eq) ? prev.filter((e) => e !== eq) : [...prev, eq]
+                  )
+                }
+              >
                 {imageUrls[eq.id] && <img src={imageUrls[eq.id]} alt={eq.name} />}
                 <div>{eq.name}</div>
               </div>
             ))}
           </div>
-          <div className="actions">
+          <div className="actions between">
             <button onClick={() => setStep(2)}>Précédent</button>
             <button disabled={selectedEquipments.length === 0} onClick={() => setStep(4)}>Suivant</button>
           </div>
         </div>
       )}
 
+      {/* Étape 4 : Récapitulatif */}
       {step === 4 && (
         <div className="step">
           <h3>Récapitulatif</h3>
@@ -145,9 +180,9 @@ export default function ReservationStepper() {
             ))}
           </ul>
           <p><strong>Total caution :</strong> {totalDeposit} €</p>
-          <div className="actions">
+          <div className="actions between">
             <button onClick={() => setStep(3)}>Précédent</button>
-            <button onClick={() => alert("Réservation validée !")}>Valider la réservation</button>
+            <button onClick={handleSubmit}>Valider la réservation</button>
           </div>
         </div>
       )}

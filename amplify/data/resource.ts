@@ -35,6 +35,7 @@ const schema = a.schema({
       startDate: a.date().required(),
       endDate: a.date().required(),
       status: a.string().default('confirmed'),
+      totalDeposit: a.integer(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
 });
