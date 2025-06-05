@@ -60,7 +60,9 @@ function Home() {
               selected={startDate}
               onChange={(date: Date | null) => {
                 setStartDate(date);
-                if (endDate && date > endDate) setEndDate(null);
+                if (date !== null && endDate && date > endDate) {
+                  setEndDate(null);
+                }
               }}
               selectsStart
               startDate={startDate}
