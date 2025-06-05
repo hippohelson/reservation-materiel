@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 //import { useEffect, useState } from "react";
 //import { generateClient } from "aws-amplify/data";
 import { Amplify } from "aws-amplify";
@@ -99,10 +99,6 @@ Amplify.configure(amplifyOutputs);
 export default function App() {
   return (
     <Router>
-      <nav>
-        <Link to="/">Accueil</Link> | <Link to="/add">Ajouter un équipement</Link>
-      </nav>
-
       <Routes>
         <Route path="/" element={<ReservationStepForm />} />
         <Route path="/add" element={<AddEquipment />} />
