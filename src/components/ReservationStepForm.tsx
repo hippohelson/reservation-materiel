@@ -54,7 +54,14 @@ export default function ReservationStepForm() {
           totalDeposit,
         });
       }
-
+      console.log("Création réservation", {
+        studentId: selectedStudent?.id,
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+        equipmentId: selectedEquipments[0]?.id,
+        totalDeposit,
+      });
+      
       alert("Réservation enregistrée !");
       setTimeout(() => {
         setStep(0);
