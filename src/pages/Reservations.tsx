@@ -6,48 +6,60 @@ import "./Reservations.css";
 const client = generateClient<Schema>();
 
 type ReservationWithDetails = Schema["Reservation"]["type"] & {
-    student: Schema["Student"]["type"] | null;
-    equipments: (Schema["Equipment"]["type"] | null)[];
-  };
-  
+  student: Schema["Student"]["type"] | null;
+  equipments: (Schema["Equipment"]["type"] | null)[];
+};
 
 export default function Reservations() {
   const [reservations, setReservations] = useState<ReservationWithDetails[]>([]);
 
-  useEffect(() => {
-    const fetchReservations = async () => {
-      const res = await client.models.Reservation.list();
-      const all = res.data ?? [];
+  const fetchReservations = async () => {
+    const res = await client.models.Reservation.list({
+      filter: { status: { eq: "confirmed" } },
+    });
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+    const all = res.data ?? [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-      const filtered = all.filter((r) => {
-        const end = new Date(r.endDate);
-        return end >= today;
+    const filtered = all.filter((r) => {
+      const end = new Date(r.endDate);
+      return end >= today;
+    });
+
+    const withDetails = await Promise.all(
+      filtered.map(async (r) => {
+        const student = await client.models.Student.get({ id: r.studentId });
+        const equipmentLinks = await client.models.EquipmentReservation.list({
+          filter: { reservationId: { eq: r.id } },
+        });
+        const equipments = await Promise.all(
+          equipmentLinks.data.map((link) =>
+            client.models.Equipment.get({ id: link.equipmentId })
+          )
+        );
+        return { ...r, student: student.data, equipments: equipments.map((e) => e.data) };
+      })
+    );
+
+    withDetails.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+    setReservations(withDetails);
+  };
+
+  const endReservation = async (id: string) => {
+    try {
+      await client.models.Reservation.update({
+        id,
+        status: "done",
       });
+      fetchReservations(); // refresh après mise à jour
+    } catch (err) {
+      console.error("Erreur lors de la mise à jour :", err);
+      alert("Impossible de mettre fin à la réservation.");
+    }
+  };
 
-      const withDetails = await Promise.all(
-        filtered.map(async (r) => {
-          const student = await client.models.Student.get({ id: r.studentId });
-          const equipmentLinks = await client.models.EquipmentReservation.list({
-            filter: { reservationId: { eq: r.id } },
-          });
-          const equipments = await Promise.all(
-            equipmentLinks.data.map((link) =>
-              client.models.Equipment.get({ id: link.equipmentId })
-            )
-          );
-          return { ...r, student: student.data, equipments: equipments.map((e) => e.data) };
-        })
-      );
-
-      // Tri par date de début croissante
-      withDetails.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-
-      setReservations(withDetails);
-    };
-
+  useEffect(() => {
     fetchReservations();
   }, []);
 
@@ -61,16 +73,17 @@ export default function Reservations() {
           {reservations.map((r) => (
             <div className="reservation-card" key={r.id}>
               <h3>{r.student?.name}</h3>
-              <p>📅 {new Date(r.startDate).toLocaleDateString()} → {new Date(r.endDate).toLocaleDateString()}</p>
+              <p>
+                📅 {new Date(r.startDate).toLocaleDateString()} →{" "}
+                {new Date(r.endDate).toLocaleDateString()}
+              </p>
               <ul>
                 {r.equipments?.map((eq) =>
                   eq ? <li key={eq.id}>{eq.name}</li> : null
                 )}
               </ul>
               <div className="reservation-actions">
-                <button>Modifier</button>
-                <button>Supprimer</button>
-                <button>Mettre fin</button>
+                <button onClick={() => endReservation(r.id)}>Mettre fin</button>
               </div>
             </div>
           ))}
