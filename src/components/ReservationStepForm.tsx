@@ -18,6 +18,9 @@ export default function ReservationStepForm() {
   const [equipmentList, setEquipmentList] = useState<Schema["Equipment"]["type"][]>([]);
   const [imageUrls, setImageUrls] = useState<Record<string, string>>({});
   const [selectedEquipments, setSelectedEquipments] = useState<Schema["Equipment"]["type"][]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [modalEquipment, setModalEquipment] = useState<Schema["Equipment"]["type"] | null>(null);
+
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -109,6 +112,21 @@ export default function ReservationStepForm() {
     }
   };
 
+  const toggleEquipment = (eq: Schema["Equipment"]["type"]) => {
+    setSelectedEquipments((prev) =>
+      prev.includes(eq) ? prev.filter((e) => e !== eq) : [...prev, eq]
+    );
+  };
+  
+  const openModal = (eq: Schema["Equipment"]["type"]) => {
+    setModalEquipment(eq);
+  };
+  
+  const closeModal = () => {
+    setModalEquipment(null);
+  };
+
+  
   return (
     <div className="reservation-form">
       {/* Étape 0 */}
@@ -182,31 +200,71 @@ export default function ReservationStepForm() {
       )}
 
       {/* Étape 3 */}
-      {step === 3 && (
-        <div className="step">
-          <label>Équipements disponibles :</label>
-          <div className="equipment-list">
-            {equipmentList.map((eq) => (
-              <div
-                key={eq.id}
-                className={`equip-card ${selectedEquipments.includes(eq) ? "selected" : ""}`}
-                onClick={() =>
-                  setSelectedEquipments((prev) =>
-                    prev.includes(eq) ? prev.filter((e) => e !== eq) : [...prev, eq]
-                  )
-                }
-              >
-                {imageUrls[eq.id] && <img src={imageUrls[eq.id]} alt={eq.name} />}
-                <div>{eq.name}</div>
-              </div>
-            ))}
+{step === 3 && (
+  <div className="step">
+    <label>Filtrer par catégorie :</label>
+    <Select
+      options={[
+        { value: "", label: "Toutes les catégories" },
+        ...Array.from(new Set(equipmentList.map((e) => e.category).filter(Boolean))).map((cat) => ({
+          value: cat!,
+          label: cat!,
+        })),
+      ]}
+      value={
+        selectedCategory
+          ? { value: selectedCategory, label: selectedCategory }
+          : { value: "", label: "Toutes les catégories" }
+      }
+      onChange={(opt) => setSelectedCategory(opt?.value || "")}
+      isClearable
+      placeholder="Catégorie"
+    />
+
+    <label>Équipements disponibles :</label>
+    <div className="equipment-list">
+      {equipmentList
+        .filter((eq) => !selectedCategory || eq.category === selectedCategory)
+        .map((eq) => (
+          <div
+            key={eq.id}
+            className={`equip-card ${selectedEquipments.includes(eq) ? "selected" : ""}`}
+          >
+            {imageUrls[eq.id] && <img src={imageUrls[eq.id]} alt={eq.name} />}
+            <div>{eq.name}</div>
+            <div className="equip-actions">
+              <button onClick={() => toggleEquipment(eq)}>
+                {selectedEquipments.includes(eq) ? "Retirer" : "Sélectionner"}
+              </button>
+              <button onClick={() => openModal(eq)}>Plus d'infos</button>
+            </div>
           </div>
-          <div className="actions between">
-            <button onClick={() => setStep(2)}>Précédent</button>
-            <button disabled={selectedEquipments.length === 0} onClick={() => setStep(4)}>Suivant</button>
-          </div>
+        ))}
+    </div>
+
+    <div className="actions between">
+      <button onClick={() => setStep(2)}>Précédent</button>
+      <button disabled={selectedEquipments.length === 0} onClick={() => setStep(4)}>Suivant</button>
+    </div>
+
+    {/* Modal */}
+    {modalEquipment && (
+        <div className="modal-backdrop" onClick={closeModal}>
+            <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>{modalEquipment.name}</h3>
+            {imageUrls[modalEquipment.id] && (
+                <img src={imageUrls[modalEquipment.id]} alt={modalEquipment.name} />
+            )}
+            <p><strong>Catégorie :</strong> {modalEquipment.category}</p>
+            <p><strong>Description :</strong> {modalEquipment.description}</p>
+            <p><strong>Caution :</strong> {modalEquipment.deposit} €</p>
+            <button onClick={closeModal}>Fermer</button>
+            </div>
         </div>
-      )}
+        )}
+    </div>
+    )}
+
 
       {/* Étape 4 */}
       {step === 4 && (
