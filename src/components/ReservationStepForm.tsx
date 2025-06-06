@@ -47,8 +47,8 @@ export default function ReservationStepForm() {
     try {
       const reservationResponse = await client.models.Reservation.create({
         studentId: selectedStudent.id,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
+        startDate: startDate.toISOString().split("T")[0],
+        endDate: endDate.toISOString().split("T")[0],
         totalDeposit,
       });
       
