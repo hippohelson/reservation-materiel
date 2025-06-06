@@ -43,38 +43,39 @@ export default function ReservationStepForm() {
 
   const handleSubmit = async () => {
     if (!selectedStudent || !startDate || !endDate || selectedEquipments.length === 0) return;
-
+  
     try {
-      for (const eq of selectedEquipments) {
-        await client.models.Reservation.create({
-          studentId: selectedStudent.id,
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
-          equipmentId: eq.id,
-          totalDeposit,
-        });
-      }
-      console.log("Création réservation", {
-        studentId: selectedStudent?.id,
-        startDate: startDate?.toISOString(),
-        endDate: endDate?.toISOString(),
-        equipmentId: selectedEquipments[0]?.id,
+      const reservationResponse = await client.models.Reservation.create({
+        studentId: selectedStudent.id,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
         totalDeposit,
       });
-      
+  
+      const reservationId = reservationResponse.data?.id;
+      if (!reservationId) throw new Error("Erreur : réservation non créée");
+  
+      for (const eq of selectedEquipments) {
+        await client.models.EquipmentReservation.create({
+          reservationId,
+          equipmentId: eq.id,
+        });
+      }
+  
       alert("Réservation enregistrée !");
-      setTimeout(() => {
-        setStep(0);
-        setSelectedStudent(null);
-        setStartDate(null);
-        setEndDate(null);
-        setSelectedEquipments([]);
-      }, 600);
+      setStep(0);
+      setSelectedStudent(null);
+      setStartDate(null);
+      setEndDate(null);
+      setSelectedEquipments([]);
+  
     } catch (err) {
       console.error("Erreur lors de la création :", err);
       alert("Une erreur est survenue lors de la réservation.");
     }
   };
+  
+  
 
   return (
     <div className="reservation-form">
