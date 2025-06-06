@@ -20,30 +20,65 @@ export default function ReservationStepForm() {
   const [selectedEquipments, setSelectedEquipments] = useState<Schema["Equipment"]["type"][]>([]);
 
   useEffect(() => {
-    client.models.Student.list().then((res) => setStudents(res.data));
+    const fetchStudents = async () => {
+      const res = await client.models.Student.list();
+      setStudents(res.data);
+    };
+    fetchStudents();
   }, []);
 
   useEffect(() => {
-    if (step === 3) {
-      client.models.Equipment.list().then(async (res) => {
+    const fetchEquipments = async () => {
+      if (step === 3 && startDate && endDate) {
+        const [equipmentsRes, reservationsRes, equipmentReservationsRes] = await Promise.all([
+          client.models.Equipment.list(),
+          client.models.Reservation.list(),
+          client.models.EquipmentReservation.list(),
+        ]);
+  
+        // Filtrer les réservations qui se chevauchent
+        const overlappingReservationIds = reservationsRes.data
+          .filter((res) => {
+            const resStart = new Date(res.startDate);
+            const resEnd = new Date(res.endDate);
+            return startDate <= resEnd && endDate >= resStart;
+          })
+          .map((res) => res.id);
+  
+        // Récupérer les équipements déjà réservés sur ces périodes
+        const reservedEquipmentIds = new Set(
+          equipmentReservationsRes.data
+            .filter((er) => overlappingReservationIds.includes(er.reservationId))
+            .map((er) => er.equipmentId)
+        );
+  
+        const availableEquipments = equipmentsRes.data.filter(
+          (eq) => !reservedEquipmentIds.has(eq.id)
+        );
+  
         const urls: Record<string, string> = {};
-        for (const eq of res.data) {
-          if (eq.image) {
-            const { url } = await getUrl({ path: eq.image });
-            urls[eq.id] = url.toString();
-          }
-        }
+        await Promise.all(
+          availableEquipments.map(async (eq) => {
+            if (eq.image) {
+              const { url } = await getUrl({ path: eq.image });
+              urls[eq.id] = url.toString();
+            }
+          })
+        );
+  
         setImageUrls(urls);
-        setEquipmentList(res.data);
-      });
-    }
-  }, [step]);
+        setEquipmentList(availableEquipments);
+      }
+    };
+    fetchEquipments();
+  }, [step, startDate, endDate]);
+  
 
   const totalDeposit = selectedEquipments.reduce((sum, eq) => sum + (eq.deposit ?? 0), 0);
 
   const handleSubmit = async () => {
     if (!selectedStudent || !startDate || !endDate || selectedEquipments.length === 0) return;
-  
+
     try {
       const reservationResponse = await client.models.Reservation.create({
         studentId: selectedStudent.id,
@@ -51,32 +86,28 @@ export default function ReservationStepForm() {
         endDate: endDate.toISOString().split("T")[0],
         totalDeposit,
       });
-      
-      console.log("Résultat brut de la création (reservationResponse):", reservationResponse);
+
       const reservationId = reservationResponse.data?.id;
       if (!reservationId) throw new Error("Erreur : réservation non créée");
-  
+
       for (const eq of selectedEquipments) {
         await client.models.EquipmentReservation.create({
           reservationId,
           equipmentId: eq.id,
         });
       }
-  
+
       alert("Réservation enregistrée !");
       setStep(0);
       setSelectedStudent(null);
       setStartDate(null);
       setEndDate(null);
       setSelectedEquipments([]);
-  
     } catch (err) {
       console.error("Erreur lors de la création :", err);
       alert("Une erreur est survenue lors de la réservation.");
     }
   };
-  
-  
 
   return (
     <div className="reservation-form">
