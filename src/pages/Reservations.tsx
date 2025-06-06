@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
 import "./Reservations.css";
+import HomeButton from "../components/HomeButton";
 
 const client = generateClient<Schema>();
 
@@ -65,6 +66,7 @@ export default function Reservations() {
 
   return (
     <div className="reservations-page">
+    <HomeButton />
       <h2>📋 Réservations en cours et à venir</h2>
       {reservations.length === 0 ? (
         <p>Aucune réservation à afficher.</p>

@@ -6,6 +6,8 @@ import { getUrl } from "aws-amplify/storage";
 import type { Schema } from "../../amplify/data/resource";
 import "react-datepicker/dist/react-datepicker.css";
 import "./ReservationStepForm.css";
+import HomeButton from "../components/HomeButton";
+
 
 const client = generateClient<Schema>();
 
@@ -129,6 +131,7 @@ export default function ReservationStepForm() {
   
   return (
     <div className="reservation-form">
+    <HomeButton />
       {/* Étape 0 */}
       {step === 0 && (
         <div className="step">

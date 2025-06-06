@@ -5,6 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ReservationStepForm from "./components/ReservationStepForm";
 import AddEquipment from "./pages/AddEquipment";
 import Reservations from "./pages/Reservations";
+
 import "./App.css";
 import "./components/EquipmentGrid.css";
 

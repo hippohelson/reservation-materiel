@@ -1,0 +1,19 @@
+.home-button {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.8rem;
+    background-color: #ffffffcc;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    padding: 0.5rem 0.65rem;
+    text-decoration: none;
+    color: #333;
+    transition: background 0.2s ease;
+    z-index: 1000;
+  }
+  
+  .home-button:hover {
+    background-color: #eee;
+  }
+  
