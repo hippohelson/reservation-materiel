@@ -199,70 +199,77 @@ export default function ReservationStepForm() {
         </div>
       )}
 
-      {/* Étape 3 */}
-{step === 3 && (
-  <div className="step">
-    <label>Filtrer par catégorie :</label>
-    <Select
-      options={[
-        { value: "", label: "Toutes les catégories" },
-        ...Array.from(new Set(equipmentList.map((e) => e.category).filter(Boolean))).map((cat) => ({
-          value: cat!,
-          label: cat!,
-        })),
-      ]}
-      value={
-        selectedCategory
-          ? { value: selectedCategory, label: selectedCategory }
-          : { value: "", label: "Toutes les catégories" }
-      }
-      onChange={(opt) => setSelectedCategory(opt?.value || "")}
-      isClearable
-      placeholder="Catégorie"
-    />
+    {/* Étape 3 */}   
+    {step === 3 && (
+        <div className="step">
+            <label>Filtrer par catégorie :</label>
+            <Select
+            options={[
+                { value: "", label: "Toutes les catégories" },
+                ...Array.from(new Set(equipmentList.map((e) => e.category).filter(Boolean))).map((cat) => ({
+                value: cat!,
+                label: cat!,
+                })),
+            ]}
+            value={
+                selectedCategory
+                ? { value: selectedCategory, label: selectedCategory }
+                : { value: "", label: "Toutes les catégories" }
+            }
+            onChange={(opt) => setSelectedCategory(opt?.value || "")}
+            isClearable
+            placeholder="Catégorie"
+            />
 
-    <label>Équipements disponibles :</label>
-    <div className="equipment-list">
-      {equipmentList
-        .filter((eq) => !selectedCategory || eq.category === selectedCategory)
-        .map((eq) => (
-          <div
-            key={eq.id}
-            className={`equip-card ${selectedEquipments.includes(eq) ? "selected" : ""}`}
-          >
-            {imageUrls[eq.id] && <img src={imageUrls[eq.id]} alt={eq.name} />}
-            <div>{eq.name}</div>
-            <div className="equip-actions">
-              <button onClick={() => toggleEquipment(eq)}>
-                {selectedEquipments.includes(eq) ? "Retirer" : "Sélectionner"}
-              </button>
-              <button onClick={() => openModal(eq)}>Plus d'infos</button>
-            </div>
-          </div>
-        ))}
-    </div>
-
-    <div className="actions between">
-      <button onClick={() => setStep(2)}>Précédent</button>
-      <button disabled={selectedEquipments.length === 0} onClick={() => setStep(4)}>Suivant</button>
-    </div>
-
-    {/* Modal */}
-    {modalEquipment && (
-        <div className="modal-backdrop" onClick={closeModal}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>{modalEquipment.name}</h3>
-            {imageUrls[modalEquipment.id] && (
-                <img src={imageUrls[modalEquipment.id]} alt={modalEquipment.name} />
-            )}
-            <p><strong>Catégorie :</strong> {modalEquipment.category}</p>
-            <p><strong>Description :</strong> {modalEquipment.description}</p>
-            <p><strong>Caution :</strong> {modalEquipment.deposit} €</p>
-            <button onClick={closeModal}>Fermer</button>
-            </div>
+        <label>Équipements disponibles :</label>
+        <div className="equipment-list">
+        {equipmentList
+            .filter((eq) => !selectedCategory || eq.category === selectedCategory)
+            .map((eq) => (
+                <div
+                key={eq.id}
+                className={`equip-card ${selectedEquipments.includes(eq) ? "selected" : ""}`}
+              >
+                <div className="equip-header">
+                  <label className="checkbox-container">
+                    <input
+                      type="checkbox"
+                      checked={selectedEquipments.includes(eq)}
+                      onChange={() => toggleEquipment(eq)}
+                    />
+                    <span className="checkmark" />
+                  </label>
+                  <button className="info-btn" onClick={() => openModal(eq)}>+</button>
+                </div>
+              
+                {imageUrls[eq.id] && <img src={imageUrls[eq.id]} alt={eq.name} />}
+                <div>{eq.name}</div>
+              </div>
+              
+            ))}
         </div>
-        )}
-    </div>
+
+        <div className="actions between">
+        <button onClick={() => setStep(2)}>Précédent</button>
+        <button disabled={selectedEquipments.length === 0} onClick={() => setStep(4)}>Suivant</button>
+        </div>
+
+        {/* Modal */}
+        {modalEquipment && (
+            <div className="modal-backdrop" onClick={closeModal}>
+                <div className="modal" onClick={(e) => e.stopPropagation()}>
+                <h3>{modalEquipment.name}</h3>
+                {imageUrls[modalEquipment.id] && (
+                    <img src={imageUrls[modalEquipment.id]} alt={modalEquipment.name} />
+                )}
+                <p><strong>Catégorie :</strong> {modalEquipment.category}</p>
+                <p><strong>Description :</strong> {modalEquipment.description}</p>
+                <p><strong>Caution :</strong> {modalEquipment.deposit} €</p>
+                <button onClick={closeModal}>Fermer</button>
+                </div>
+            </div>
+            )}
+        </div>
     )}
 
 
