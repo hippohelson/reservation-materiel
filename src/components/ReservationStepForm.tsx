@@ -51,7 +51,8 @@ export default function ReservationStepForm() {
         endDate: endDate.toISOString(),
         totalDeposit,
       });
-  
+      
+      console.log("Résultat brut de la création (reservationResponse):", reservationResponse);
       const reservationId = reservationResponse.data?.id;
       if (!reservationId) throw new Error("Erreur : réservation non créée");
   
