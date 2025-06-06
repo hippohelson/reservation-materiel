@@ -5,63 +5,77 @@ import "./Reservations.css";
 
 const client = generateClient<Schema>();
 
+type ReservationWithDetails = Schema["Reservation"]["type"] & {
+    student: Schema["Student"]["type"] | null;
+    equipments: (Schema["Equipment"]["type"] | null)[];
+  };
+  
+
 export default function Reservations() {
-  const [reservations, setReservations] = useState<Schema["Reservation"]["type"][]>([]);
-  const [students, setStudents] = useState<Record<string, string>>({});
-  const [equipments, setEquipments] = useState<Record<string, string>>({});
-  const [links, setLinks] = useState<Record<string, string[]>>({});
+  const [reservations, setReservations] = useState<ReservationWithDetails[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const [resList, studentList, equipmentList, linkList] = await Promise.all([
-        client.models.Reservation.list(),
-        client.models.Student.list(),
-        client.models.Equipment.list(),
-        client.models.EquipmentReservation.list()
-      ]);
+    const fetchReservations = async () => {
+      const res = await client.models.Reservation.list();
+      const all = res.data ?? [];
 
-      const now = new Date();
-      const futureRes = resList.data.filter((r) => new Date(r.endDate) >= now);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-      const studentMap = Object.fromEntries(studentList.data.map((s) => [s.id, s.name]));
-      const equipmentMap = Object.fromEntries(equipmentList.data.map((e) => [e.id, e.name]));
-      
-      const linkMap: Record<string, string[]> = {};
-      for (const link of linkList.data) {
-        if (!linkMap[link.reservationId]) linkMap[link.reservationId] = [];
-        linkMap[link.reservationId].push(link.equipmentId);
-      }
+      const filtered = all.filter((r) => {
+        const end = new Date(r.endDate);
+        return end >= today;
+      });
 
-      setReservations(
-        futureRes.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+      const withDetails = await Promise.all(
+        filtered.map(async (r) => {
+          const student = await client.models.Student.get({ id: r.studentId });
+          const equipmentLinks = await client.models.EquipmentReservation.list({
+            filter: { reservationId: { eq: r.id } },
+          });
+          const equipments = await Promise.all(
+            equipmentLinks.data.map((link) =>
+              client.models.Equipment.get({ id: link.equipmentId })
+            )
+          );
+          return { ...r, student: student.data, equipments: equipments.map((e) => e.data) };
+        })
       );
-      setStudents(studentMap);
-      setEquipments(equipmentMap);
-      setLinks(linkMap);
+
+      // Tri par date de début croissante
+      withDetails.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+
+      setReservations(withDetails);
     };
 
-    fetchData();
+    fetchReservations();
   }, []);
 
   return (
-    <div className="reservation-list">
-      <h2>Réservations à venir</h2>
-      {reservations.map((r) => (
-        <div key={r.id} className="reservation-card">
-          <p><strong>Étudiant :</strong> {students[r.studentId]}</p>
-          <p><strong>Du :</strong> {new Date(r.startDate).toLocaleDateString()}</p>
-          <p><strong>Au :</strong> {new Date(r.endDate).toLocaleDateString()}</p>
-          <p><strong>Matériel :</strong></p>
-          <ul>
-            {(links[r.id] || []).map((eid) => (
-              <li key={eid}>{equipments[eid]}</li>
-            ))}
-          </ul>
-          <button onClick={() => alert("À implémenter : modifier / supprimer / terminer")}>
-            Gérer la réservation
-          </button>
+    <div className="reservations-page">
+      <h2>📋 Réservations en cours et à venir</h2>
+      {reservations.length === 0 ? (
+        <p>Aucune réservation à afficher.</p>
+      ) : (
+        <div className="reservations-list">
+          {reservations.map((r) => (
+            <div className="reservation-card" key={r.id}>
+              <h3>{r.student?.name}</h3>
+              <p>📅 {new Date(r.startDate).toLocaleDateString()} → {new Date(r.endDate).toLocaleDateString()}</p>
+              <ul>
+                {r.equipments?.map((eq) =>
+                  eq ? <li key={eq.id}>{eq.name}</li> : null
+                )}
+              </ul>
+              <div className="reservation-actions">
+                <button>Modifier</button>
+                <button>Supprimer</button>
+                <button>Mettre fin</button>
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
 }
