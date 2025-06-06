@@ -1,0 +1,26 @@
+.reservation-list {
+    padding: 2rem;
+  }
+  
+  .reservation-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #f9f9f9;
+  }
+  
+  .reservation-card button {
+    margin-top: 1rem;
+    background: #0066cc;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .reservation-card button:hover {
+    background: #004ea2;
+  }
+  

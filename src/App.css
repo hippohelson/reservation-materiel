@@ -40,3 +40,29 @@
 .read-the-docs {
   color: #888;
 }
+.home {
+  text-align: center;
+  padding: 3rem;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  align-items: center;
+}
+
+.menu-button {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background-color: #0066cc;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.menu-button:hover {
+  background-color: #004ea2;
+}

@@ -1,106 +1,35 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-//import { useEffect, useState } from "react";
-//import { generateClient } from "aws-amplify/data";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { Amplify } from "aws-amplify";
 import amplifyOutputs from "../amplify_outputs.json";
-//import type { Schema } from "../amplify/data/resource";
-//import Select from "react-select";
-//import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-//import EquipmentGrid from "./components/EquipmentGrid";
 import ReservationStepForm from "./components/ReservationStepForm";
 import AddEquipment from "./pages/AddEquipment";
+import Reservations from "./pages/Reservations";
 import "./App.css";
 import "./components/EquipmentGrid.css";
 
 Amplify.configure(amplifyOutputs);
-//const client = generateClient<Schema>();
 
-/* function Home() {
-  const [students, setStudents] = useState<Array<Schema["Student"]["type"]>>([]);
-  const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-
-
-  const [equipmentList, setEquipmentList] = useState<Array<Schema["Equipment"]["type"]>>([]);
-
-  useEffect(() => {
-    client.models.Student.list().then((res) => {
-      setStudents(res.data);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (selectedStudent && startDate && endDate) {
-      client.models.Equipment.list().then((res) => {
-        setEquipmentList(res.data); // plus tard, on filtrera selon les dispos
-      });
-    }
-  }, [selectedStudent, startDate, endDate]);
-
+function Home() {
   return (
-    <div>
-      <h1>Réserver du matériel</h1>
-
-        <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap", marginBottom: "2rem" }}>
-          <div style={{ minWidth: "250px" }}>
-            <label>Étudiant :</label>
-            <Select
-              options={students.map((s) => ({ value: s.id, label: s.name }))}
-              value={students.map((s) => ({ value: s.id, label: s.name })).find((opt) => opt.value === selectedStudent)}
-              onChange={(option) => setSelectedStudent(option?.value || "")}
-              placeholder="Choisir un étudiant"
-              isClearable
-            />
-          </div>
-
-          <div>
-            <label>Du :</label>
-            <DatePicker
-              selected={startDate}
-              onChange={(date: Date | null) => {
-                setStartDate(date);
-                if (date !== null && endDate && date > endDate) {
-                  setEndDate(null);
-                }
-              }}
-              selectsStart
-              startDate={startDate}
-              endDate={endDate}
-              dateFormat="dd/MM/yyyy"
-              placeholderText="Date de début"
-            />
-          </div>
-
-          <div>
-            <label>Au :</label>
-            <DatePicker
-              selected={endDate}
-              onChange={(date: Date | null) => setEndDate(date)}
-              selectsEnd
-              startDate={startDate}
-              endDate={endDate}
-              minDate={startDate || undefined}
-              dateFormat="dd/MM/yyyy"
-              placeholderText="Date de retour"
-            />
-          </div>
-        </div>
-
-
-      {selectedStudent && startDate && endDate && (
-        <EquipmentGrid equipmentList={equipmentList} />
-      )}
+    <div className="home">
+      <h1>🎥 Site de réservation de matériel</h1>
+      <h2>MJM Nantes</h2>
+      <div className="menu">
+        <Link className="menu-button" to="/reserve">📅 Faire une réservation</Link>
+        <Link className="menu-button" to="/reservations">📋 Voir les réservations</Link>
+      </div>
     </div>
   );
-} */
+}
 
 export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<ReservationStepForm />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/reserve" element={<ReservationStepForm />} />
+        <Route path="/reservations" element={<Reservations />} />
         <Route path="/add" element={<AddEquipment />} />
       </Routes>
     </Router>
